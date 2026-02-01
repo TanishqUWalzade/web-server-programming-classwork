@@ -1,1 +1,0 @@
-Asset folder for image
