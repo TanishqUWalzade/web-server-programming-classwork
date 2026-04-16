@@ -1,17 +1,14 @@
 import { Router } from "express"
-import { getAll, get, create, update, remove } from "../models/users"
-import { User, DataEnvelope, DataListEnvelope } from "../types"
+import { getAll, get, create, update, remove } from "../models/products"
+import { Product, DataEnvelope, DataListEnvelope } from "../types"
 
 const app = Router()
 
 app.get("/", (req, res) => {
     const { list, count } = getAll(req.query)
-    const sanitizedUsers = list.map((x) => ({
-        ...x,
-        password: undefined,
-    }))
-    const response: DataListEnvelope<User> = {
-        data: sanitizedUsers,
+
+    const response: DataListEnvelope<Product> = {
+        data: list,
         isSuccess: true,
         total: count,
     }
@@ -27,7 +24,7 @@ app.get("/", (req, res) => {
     })
     .get("/:id", (req, res) => {
         const { id } = req.params
-        const response: DataEnvelope<User> = {
+        const response: DataEnvelope<Product> = {
             data: get(Number(id)),
             isSuccess: true,
         }
@@ -35,29 +32,29 @@ app.get("/", (req, res) => {
     })
 
     .post("/", (req, res) => {
-        const newUser = create(req.body)
-        const response: DataEnvelope<User> = {
-            data: newUser,
+        const newItem = create(req.body)
+        const response: DataEnvelope<Product> = {
+            data: newItem,
             isSuccess: true,
         }
         res.send(response)
     })
     .patch("/:id", (req, res) => {
         const { id } = req.params
-        const updatedUser = update(Number(id), req.body)
-        const response: DataEnvelope<User> = {
-            data: updatedUser as User,
+        const updatedItem = update(Number(id), req.body)
+        const response: DataEnvelope<Product> = {
+            data: updatedItem,
             isSuccess: true,
         }
         res.send(response)
     })
     .delete("/:id", (req, res) => {
         const { id } = req.params
-        const removedUser = remove(Number(id))
-        const response: DataEnvelope<User> = {
-            data: removedUser,
+        const removedItem = remove(Number(id))
+        const response: DataEnvelope<Product> = {
+            data: removedItem,
             isSuccess: true,
-            message: `User ${removedUser.firstName} ${removedUser.lastName} has been removed.`,
+            message: `Product ${removedItem.title} has been removed.`,
         }
         res.send(response)
     })
