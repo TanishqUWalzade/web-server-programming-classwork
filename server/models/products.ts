@@ -1,6 +1,9 @@
 import type { Product } from "../types"
 import data1 from "../data/products.json"
 import { PagingRequest } from "../types/dataEnvelopes"
+import { connect } from "./supabase"
+
+export const TABLE_NAME = "products"
 
 type ItemType = Product
 const data = {
@@ -9,6 +12,13 @@ const data = {
 }
 
 export function getAll(params: PagingRequest) {
+    const db = connect()
+
+    const result = db.from(TABLE_NAME).select("*")
+    if (result.error) {
+        throw result.error
+    }
+
     let list = data.items as ItemType[]
     const count = list.length
 

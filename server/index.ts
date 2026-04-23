@@ -5,6 +5,8 @@ import cartController from "./controllers/cart"
 import { DataEnvelope } from "./types"
 import { config } from "dotenv"
 
+export const supabase = connect()
+
 config()
 
 const PORT = process.env.PORT ?? 3000
