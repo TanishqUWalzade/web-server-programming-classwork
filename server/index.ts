@@ -1,10 +1,15 @@
 import express from "express"
 import usersController from "./controllers/users"
 import productController from "./controllers/products"
+import cartController from "./controllers/cart"
 import { DataEnvelope } from "./types"
+import { config } from "dotenv"
 
-const PORT = 3000
-const SERVER = "localhost"
+config()
+
+const PORT = process.env.PORT ?? 3000
+const SERVER = process.env.SERVER ?? "localhost"
+const STATIC_DIR = process.env.STATIC_DIR ?? "client/dist"
 
 const app = express()
 
@@ -17,14 +22,15 @@ app.use((_req, res, next) => {
 }).use(express.json()) // Middleware to parse JSON request bodies
 
 ///////// Routes
-app.get("/", (_req, res) => {
-    res.send("Hello World!")
-})
+app.use(express.static(STATIC_DIR))
+
     .get("/suny", (_req, res) => {
         res.send("The best plan of my life!")
     })
     .use("/api/v1/users", usersController)
     .use("/api/v1/products", productController)
+    .use("/api/v1/cart", cartController)
+
 //////// Error handling
 app.use(
     (
