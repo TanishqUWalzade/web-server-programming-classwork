@@ -11,15 +11,30 @@ const data = {
     items: data1.products,
 }
 
-export function getAll(params: PagingRequest) {
+export async function getAll(params: PagingRequest) {
     const db = connect()
 
-    const result = db.from(TABLE_NAME).select("*")
+    let query = db.from(TABLE_NAME).select("*")
+
+    if (params?.search) {
+        query = query.ilike("title", `%${params.search}%`).or(
+            `description.ilike.%${params.search}%`,
+        )
+    }
+    if (params?.sortBy) {
+        query = query.order(params.sortBy, {
+            ascending: !params.descending,
+        })
+    }
+
+    const result = await query
+
+
     if (result.error) {
         throw result.error
     }
 
-    let list = data.items as ItemType[]
+    const list = data.items as ItemType[]
     const count = list.length
 
     if (params?.search) {
