@@ -20,6 +20,16 @@ export type Product = {
     images: string[]
     thumbnail: string
 }
+export const productKeys: (keyof Product)[] = [
+    "title",
+    "description",
+    "category",
+    "price",
+    "tags",
+    "brand",
+    "images",
+    "thumbnail",
+]
 
 export type CartItem = {
     product: Product
@@ -36,6 +46,14 @@ export type UserAddress = {
     postalCode: string
     country: string
 }
+export const userAddressKeys: (keyof UserAddress)[] = [
+    "address",
+    "city",
+    "state",
+    "stateCode",
+    "postalCode",
+    "country",
+]
 
 export type User = {
     id: number
@@ -49,3 +67,13 @@ export type User = {
     address: UserAddress
     role: UserRole
 }
+export const userKeys: (keyof User)[] = [
+    "firstName",
+    "lastName",
+    "gender",
+    "email",
+    "phone",
+    "birthDate",
+    "image",
+    "role",
+]
