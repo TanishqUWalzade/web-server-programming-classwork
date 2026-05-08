@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cart';
+import useSessionStore from '@/stores/session';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 const isActive = ref(false);
 const cartStore = useCartStore();
+const sessionStore = useSessionStore();
+
+function login() {
+    sessionStore.login();
+}
 
 function toggleCart() {
     console.log('Toggling cart sidebar');
@@ -40,6 +46,10 @@ function toggleCart() {
 
                     <RouterLink to="/products" active-class="is-active" class="navbar-item">
                         Products
+                    </RouterLink>
+
+                    <RouterLink to="/calendar" active-class="is-active" class="navbar-item">
+                        Calendar
                     </RouterLink>
 
                     <RouterLink to="/about" active-class="is-active" class="navbar-item">
@@ -78,14 +88,29 @@ function toggleCart() {
                         </a>
 
                     </div>
-                    <div class="navbar-item">
+
+                    <div v-if="sessionStore.user" class="navbar-item">
+                        <img :src="sessionStore.user.image" alt="Profile Picture" class="is-rounded" width="30"
+                             height="30">
+                        <div style="line-height: 1em;">
+                            {{ sessionStore.user.firstName }} {{ sessionStore.user.lastName }} <br />
+                            <small>{{ sessionStore.user.email }}</small>
+                        </div>
+                        <div>
+                            (<a @click="sessionStore.logout">
+                                Not You?
+                            </a>)
+                        </div>
+                    </div>
+                    <div class="navbar-item" v-else>
+
                         <div class="buttons">
                             <RouterLink to="/sign-up" active-class="is-active" class="button is-primary">
                                 <strong>Sign up</strong>
                             </RouterLink>
-                            <RouterLink to="/log-in" active-class="is-active" class="button is-light">
+                            <button @click="login" class="button is-light">
                                 Log in
-                            </RouterLink>
+                            </button>
                         </div>
                     </div>
                 </div>

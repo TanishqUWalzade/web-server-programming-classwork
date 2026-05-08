@@ -16,6 +16,11 @@ const router = createRouter({
       component: () => import('../views/ProductList.vue'),
     },
     {
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('../views/CalendarEventList.vue'),
+    },
+    {
       path: '/admin/products',
       name: 'admin-products',
       component: () => import('../views/Admin/ProductList.vue'),
@@ -24,6 +29,16 @@ const router = createRouter({
       path: '/admin/products/edit/:id?',
       name: 'admin-product-edit',
       component: () => import('../views/Admin/ProductEdit.vue'),
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('../views/Admin/UserList.vue'),
+    },
+    {
+      path: '/admin/users/edit/:id?',
+      name: 'admin-user-edit',
+      component: () => import('../views/Admin/UserEdit.vue'),
     },
     {
       path: '/about',

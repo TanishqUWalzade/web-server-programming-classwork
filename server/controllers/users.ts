@@ -1,10 +1,19 @@
 import { Router } from "express"
-import { getAll, get, create, update, remove, seed } from "../models/users"
+import {
+    getAll,
+    get,
+    create,
+    update,
+    remove,
+    seed,
+    login,
+} from "../models/users"
 import { User, DataEnvelope, DataListEnvelope } from "../types"
+import { requireAuth } from "../middleware/auth"
 
 const app = Router()
 
-app.get("/", async (req, res) => {
+app.get("/", requireAuth("admin"), async (req, res) => {
     const { list, count } = await getAll(req.query)
     const sanitizedUsers = list.map((x) => ({
         ...x,
@@ -17,7 +26,7 @@ app.get("/", async (req, res) => {
     }
     res.send(response)
 })
-    .get("/count", async (req, res) => {
+    .get("/count", requireAuth("admin"), async (req, res) => {
         const { count } = await getAll(req.query)
         const response: DataEnvelope<{ count: number }> = {
             data: { count },
@@ -25,7 +34,7 @@ app.get("/", async (req, res) => {
         }
         res.send(response)
     })
-    .get("/:id", async (req, res) => {
+    .get("/:id", requireAuth(), async (req, res) => {
         const { id } = req.params
         const response: DataEnvelope<User> = {
             data: await get(Number(id)),
@@ -33,8 +42,17 @@ app.get("/", async (req, res) => {
         }
         res.send(response)
     })
+    .post("/login", async (req, res) => {
+        const { googleToken } = req.body
 
-    .post("/", async (req, res) => {
+        const response: DataEnvelope<{ token: string; user: User }> = {
+            data: await login(googleToken, "google"),
+            isSuccess: true,
+        }
+        res.send(response)
+    })
+
+    .post("/", requireAuth("admin"), async (req, res) => {
         const newUser = await create(req.body)
         const response: DataEnvelope<User> = {
             data: newUser,
@@ -42,7 +60,7 @@ app.get("/", async (req, res) => {
         }
         res.send(response)
     })
-    .patch("/:id", async (req, res) => {
+    .patch("/:id", requireAuth("admin"), async (req, res) => {
         const { id } = req.params
         const updatedUser = await update(Number(id), req.body)
         const response: DataEnvelope<User> = {
@@ -51,7 +69,7 @@ app.get("/", async (req, res) => {
         }
         res.send(response)
     })
-    .delete("/:id", async (req, res) => {
+    .delete("/:id", requireAuth("admin"), async (req, res) => {
         const { id } = req.params
         const removedUser = await remove(Number(id))
         const response: DataEnvelope<User> = {
@@ -61,7 +79,7 @@ app.get("/", async (req, res) => {
         }
         res.send(response)
     })
-    .post("/seed", async (_req, res) => {
+    .post("/seed", requireAuth("admin"), async (_req, res) => {
         const count = await seed()
         const response: DataEnvelope<number | null> = {
             data: count,

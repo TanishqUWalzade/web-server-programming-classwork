@@ -38,36 +38,24 @@ export type CartItem = {
 
 export type UserRole = "admin" | "moderator" | "user"
 
-export type UserAddress = {
-    address: string
-    city: string
-    state: string
-    stateCode: string
-    postalCode: string
-    country: string
-}
-export const userAddressKeys: (keyof UserAddress)[] = [
-    "address",
-    "city",
-    "state",
-    "stateCode",
-    "postalCode",
-    "country",
-]
-
 export type User = {
-    id: number
+    id?: number
     firstName: string
     lastName: string
-    gender: string
+    gender?: string
     email: string
-    phone: string
-    birthDate: string
-    image: string
-    address: UserAddress
-    role: UserRole
+    phone?: string
+    birthDate?: string
+    image?: string
+    role?: UserRole
+    address?: string
+    city?: string
+    state?: string
+    stateCode?: string
+    postalCode?: string
+    country?: string
 }
-export const userKeys: (keyof User)[] = [
+export const userKeys = [
     "firstName",
     "lastName",
     "gender",
@@ -76,4 +64,12 @@ export const userKeys: (keyof User)[] = [
     "birthDate",
     "image",
     "role",
+]
+export const userAddressKeys = [
+    "address",
+    "city",
+    "state",
+    "stateCode",
+    "postalCode",
+    "country",
 ]

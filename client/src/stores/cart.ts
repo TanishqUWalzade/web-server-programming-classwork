@@ -17,13 +17,21 @@ export const useCartStore = defineStore('cart', () => {
   const sessionStore = useSessionStore()
 
   function loadCart() {
-    sessionStore
-      .api<DataListEnvelope<CartItem>>(`cart/${sessionStore.user?.id ?? 1}`)
-      .then((response) => {
-        items.value = response.data
-      })
+    sessionStore.api<DataListEnvelope<CartItem>>(`cart`).then((response) => {
+      items.value = response.data
+    })
   }
-  loadCart()
+  watch(
+    () => sessionStore.user,
+    () => {
+      if (sessionStore.user) {
+        loadCart()
+      } else {
+        items.value = []
+      }
+    },
+    { immediate: true },
+  )
 
   function addItem(productId: number) {
     updateItem(productId, 1)
@@ -45,13 +53,11 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   function saveChangesToCartItem(productId: number, quantity: number) {
-    sessionStore
-      .api<DataEnvelope<CartItem>>(`cart/${sessionStore.user?.id ?? 1}`, { productId, quantity })
-      .then((response) => {
-        if (response.message) {
-          sessionStore.addMessage(response.message, response.isSuccess ? 'info' : 'danger')
-        }
-      })
+    sessionStore.api<DataEnvelope<CartItem>>(`cart`, { productId, quantity }).then((response) => {
+      if (response.message) {
+        sessionStore.addMessage(response.message, response.isSuccess ? 'info' : 'danger')
+      }
+    })
   }
 
   watch(

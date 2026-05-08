@@ -1,44 +1,46 @@
 <script setup lang="ts">
-import { useProductsStore } from '@/stores/products';
+import { useUsersStore } from '@/stores/users';
 import { RouterLink } from 'vue-router';
-import type { Product } from '../../../../server/types';
+import type { User } from '../../../../server/types';
 import { confirm } from '@/components/DialogBoxes.vue';
 import PaginationControls from '@/components/PaginationControls.vue';
 import { ref } from 'vue';
-import { watchDebounced } from '@vueuse/core';
 import type { PagingRequest } from '../../../../server/types/dataEnvelopes';
+import { watchDebounced } from '@vueuse/core';
 
-const products = useProductsStore()
+const users = useUsersStore()
 const pagination = ref<PagingRequest>({ page: 1, pageSize: 10 })
-if (!products.totalCount) {
-    products.loadProducts(pagination.value)
+if (!users.totalCount) {
+    users.loadUsers(pagination.value)
 }
 
 watchDebounced(pagination, (newPagination) => {
-    products.loadProducts(newPagination)
+    users.loadUsers(newPagination)
 }, { debounce: 500, deep: true })
 
-async function remove(product: Product) {
-    if (await confirm("Delete", `Are you sure that you want to delete ${product.title}`)) {
-        products.deleteProduct(product.id)
+async function remove(user: User) {
+    if (!user.id) {
+        console.error('User ID is missing, cannot delete user.')
+        return
+    }
+    if (await confirm("Delete", `Are you sure that you want to delete ${user.firstName} ${user.lastName}?`)) {
+        users.deleteUser(user.id)
     }
 }
 </script>
 
 <template>
-    <div id="admin-product-list">
+    <div id="admin-user-list">
         <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
                 <tr>
                     <th></th>
-                    <th>Title</th>
-                    <th>Category</th>
-                    <th>Brand</th>
-                    <th>Price</th>
-                    <th>Tags</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
                     <th>
-                        Description
-                        <div class="control has-icons-left" style="display: inline-block; margin-left: 1em;">
+                        <div class="control has-icons-left" style="display: inline-block; margin-right: 1em;">
 
                             <input type="text" class="input is-rounded is-small" placeholder="Search..."
                                    v-model="pagination.search">
@@ -46,9 +48,9 @@ async function remove(product: Product) {
                                 <i class="fas fa-search"></i>
                             </span>
                         </div>
-                    </th>
-                    <th>
-                        <RouterLink to="/admin/products/edit" class="button is-small is-primary">
+
+
+                        <RouterLink to="/admin/users/edit" class="button is-small is-primary">
                             <span>New</span>
                             <span class="icon">
                                 <i class="fas fa-plus"></i>
@@ -58,29 +60,21 @@ async function remove(product: Product) {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="product in products.products" :key="product.id">
+                <tr v-for="user in users.users" :key="user.id">
                     <td>
-                        <img :src="product.thumbnail" alt="Product Image" class="image is-4by3">
+                        <img :src="user.image" alt="User Avatar" class="image is-32x32 is-rounded">
                     </td>
-                    <td>{{ product.title }}</td>
-                    <td>{{ product.category }}</td>
-                    <td>{{ product.brand }}</td>
-                    <td>${{ product.price }}</td>
+                    <td>{{ user.firstName }}</td>
+                    <td>{{ user.lastName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
                     <td>
-                        <div class="tags">
-                            <span v-for="tag in product.tags" :key="tag" class="tag is-warning is-light">{{ tag
-                                }}</span>
-                        </div>
-
-                    </td>
-                    <td>{{ product.description }}</td>
-                    <td>
-                        <RouterLink :to="`/admin/products/edit/${product.id}`" class="button is-small is-warning">
+                        <RouterLink :to="`/admin/users/edit/${user.id}`" class="button is-small is-warning">
                             <span class="icon">
                                 <i class="fas fa-edit"></i>
                             </span>
                         </RouterLink>
-                        <button class="button is-small is-danger" @click="remove(product)">
+                        <button class="button is-small is-danger" @click="remove(user)">
                             <span class="icon">
                                 <i class="fas fa-trash"></i>
                             </span>
@@ -90,8 +84,7 @@ async function remove(product: Product) {
             </tbody>
         </table>
         <PaginationControls v-model:current-page="pagination.page" v-model:page-size="pagination.pageSize"
-                            :total-pages="Math.ceil((products.totalCount ?? 1) / (pagination.pageSize ?? 1))" />
-
+                            :total-pages="Math.ceil((users.totalCount ?? 1) / (pagination.pageSize ?? 1))" />
     </div>
 </template>
 
